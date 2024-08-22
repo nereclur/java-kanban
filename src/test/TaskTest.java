@@ -1,8 +1,11 @@
-package task;
+package test;
 
 import manager.InMemoryTaskManager;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import task.Task;
+import task.TaskStatus;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TaskTest {
@@ -39,6 +42,6 @@ class TaskTest {
     @Test
     void shouldBeNEWStatus() {
         Task task = new Task("Купит хулеб", "Пойдит в мазин купит лепешка");
-        assertEquals(TaskStatus.NEW, task.getStatus());
+        Assertions.assertEquals(TaskStatus.NEW, task.getStatus());
     }
 }
