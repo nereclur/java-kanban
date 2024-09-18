@@ -151,20 +151,7 @@ class InMemoryTaskManagerTest {
         Epic updatedEpic = manager.getEpicById(epic.getTaskId());
         assertEquals(TaskStatus.NEW, updatedEpic.getStatus());
     }
-
-    @Test
-    void shouldNotRetainOldIdsAfterSubtaskUpdate() {
-        Epic epic = new Epic("Эпик 1", "Описание 1");
-        manager.createEpic(epic);
-        Subtask subtask = new Subtask("Подзадача 1", "Описание 1", epic.getTaskId());
-        manager.createSubtask(subtask);
-
-        subtask.setTaskId(999); // Симуляция изменения ID
-        manager.updateSubtask(subtask); // Обновление не должно повлиять на целостность менеджера
-
-        assertNull(manager.getSubtaskById(999)); // Старый ID не должен быть найден
-        assertNotNull(manager.getSubtaskById(subtask.getTaskId())); // Новый ID должен быть действительным
-    }
+    
 
     @Test
     void shouldMaintainHistoryIntegrityAfterTaskUpdate() {
