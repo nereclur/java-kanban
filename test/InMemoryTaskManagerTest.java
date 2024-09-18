@@ -46,7 +46,6 @@ class InMemoryTaskManagerTest {
         Task task = new Task("Задача 1", "Описание 1");
         manager.createTask(task);
         Task updatedTask = new Task("Обновленная задача 1", "Обновленное описание");
-        updatedTask.setTaskId(task.getTaskId());
         manager.updateTask(updatedTask, task.getTaskId());
         Task retrievedTask = manager.getTaskById(task.getTaskId());
         assertEquals("Обновленная задача 1", retrievedTask.getName());
@@ -121,12 +120,12 @@ class InMemoryTaskManagerTest {
 
     @Test
     void shouldContainTasksAfterReceivingThem() {
-        Task task = new Task("Task 1", "Description 1");
+        Task task = new Task("Test Task", "Description");
         manager.createTask(task);
         manager.getTaskById(task.getTaskId());
         List<Task> history = manager.getHistory();
         assertEquals(1, history.size());
-        assertEquals(task, history.get(0));
+        assertEquals(task.getTaskId(), history.get(0).getTaskId());
     }
 
     @Test
@@ -160,11 +159,11 @@ class InMemoryTaskManagerTest {
         Subtask subtask = new Subtask("Подзадача 1", "Описание 1", epic.getTaskId());
         manager.createSubtask(subtask);
 
-        subtask.setTaskId(999); // Simulate ID change
-        manager.updateSubtask(subtask); // Update should not affect manager's integrity
+        subtask.setTaskId(999); // Симуляция изменения ID
+        manager.updateSubtask(subtask); // Обновление не должно повлиять на целостность менеджера
 
-        assertNull(manager.getSubtaskById(999)); // Old ID should not be found
-        assertNotNull(manager.getSubtaskById(subtask.getTaskId())); // New ID should be valid
+        assertNull(manager.getSubtaskById(999)); // Старый ID не должен быть найден
+        assertNotNull(manager.getSubtaskById(subtask.getTaskId())); // Новый ID должен быть действительным
     }
 
     @Test
@@ -174,7 +173,6 @@ class InMemoryTaskManagerTest {
         manager.getTaskById(task.getTaskId());
 
         Task updatedTask = new Task("Updated Task", "New Description");
-        updatedTask.setTaskId(task.getTaskId());
         manager.updateTask(updatedTask, task.getTaskId());
 
         List<Task> history = manager.getHistory();

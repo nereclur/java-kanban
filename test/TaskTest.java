@@ -14,8 +14,8 @@ class TaskTest {
     void shouldReturnTaskId1() {
         InMemoryTaskManager manager = new InMemoryTaskManager();
         Task task = new Task("Купит хулеб", "Пойдит в мазин купит лепешка");
-        manager.createTask(task);
-        int taskId = task.getTaskId();
+        manager.createTask(task); // Создаем задачу через менеджер
+        int taskId = task.getTaskId(); // Получаем ID после создания
         assertEquals(1, taskId);
     }
 
@@ -26,7 +26,7 @@ class TaskTest {
         Task task3 = new Task("Анжуманя", "анжуманя делат болшой руки");
         manager.createTask(task2);
         manager.createTask(task3);
-        int task3Id = task3.getTaskId();
+        int task3Id = task3.getTaskId(); // Получаем ID после создания
         assertEquals(3, task3Id);
     }
 
