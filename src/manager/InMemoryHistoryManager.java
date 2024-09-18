@@ -1,11 +1,11 @@
 package manager;
 
 import task.Task;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 import java.util.ArrayList;
-
 
 
 public class InMemoryHistoryManager implements HistoryManager {
@@ -50,9 +50,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         return tasks;
     }
 
-
     public void remove(Node node) {
-        if(node == head && node == tail) {
+        if (node == head && node == tail) {
             head = tail = null;
         } else if (node == head) {
             head = head.next;

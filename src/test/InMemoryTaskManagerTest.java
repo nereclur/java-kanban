@@ -1,6 +1,7 @@
 package test;
 
 import manager.InMemoryTaskManager;
+import manager.InMemoryHistoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
@@ -10,7 +11,7 @@ import task.TaskStatus;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
 
@@ -101,7 +102,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldEpicStatusBeTheSameLikeSubtasksStatus() {
+    void shouldEpicStatusBeUpdatedCorrectly() {
         Epic epic = new Epic("Эпик 1", "Описание 1");
         manager.createEpic(epic);
         Subtask subtask1 = new Subtask("Подзадача 1", "Описание 1", epic.getTaskId());
@@ -127,5 +128,58 @@ class InMemoryTaskManagerTest {
         List<Task> history = manager.getHistory();
         assertEquals(1, history.size());
         assertEquals(task, history.get(0));
+    }
+
+    @Test
+    void shouldNotContainOldSubtaskIdsAfterRemoval() {
+        Epic epic = new Epic("Эпик 1", "Описание 1");
+        manager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача 1", "Описание 1", epic.getTaskId());
+        manager.createSubtask(subtask);
+        manager.removeSubtaskById(subtask.getTaskId());
+
+        Epic updatedEpic = manager.getEpicById(epic.getTaskId());
+        assertTrue(updatedEpic.getSubtasks().isEmpty());
+    }
+
+    @Test
+    void shouldUpdateEpicStatusWhenSubtaskRemoved() {
+        Epic epic = new Epic("Эпик 1", "Описание 1");
+        manager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача 1", "Описание 1", epic.getTaskId());
+        manager.createSubtask(subtask);
+        manager.removeSubtaskById(subtask.getTaskId());
+
+        Epic updatedEpic = manager.getEpicById(epic.getTaskId());
+        assertEquals(TaskStatus.NEW, updatedEpic.getStatus());
+    }
+
+    @Test
+    void shouldNotRetainOldIdsAfterSubtaskUpdate() {
+        Epic epic = new Epic("Эпик 1", "Описание 1");
+        manager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача 1", "Описание 1", epic.getTaskId());
+        manager.createSubtask(subtask);
+
+        subtask.setTaskId(999); // Simulate ID change
+        manager.updateSubtask(subtask); // Update should not affect manager's integrity
+
+        assertNull(manager.getSubtaskById(999)); // Old ID should not be found
+        assertNotNull(manager.getSubtaskById(subtask.getTaskId())); // New ID should be valid
+    }
+
+    @Test
+    void shouldMaintainHistoryIntegrityAfterTaskUpdate() {
+        Task task = new Task("Test Task", "Description");
+        manager.createTask(task);
+        manager.getTaskById(task.getTaskId());
+
+        Task updatedTask = new Task("Updated Task", "New Description");
+        updatedTask.setTaskId(task.getTaskId());
+        manager.updateTask(updatedTask, task.getTaskId());
+
+        List<Task> history = manager.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(updatedTask.getTaskId(), history.get(0).getTaskId());
     }
 }
