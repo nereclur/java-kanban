@@ -151,7 +151,7 @@ class InMemoryTaskManagerTest {
         Epic updatedEpic = manager.getEpicById(epic.getTaskId());
         assertEquals(TaskStatus.NEW, updatedEpic.getStatus());
     }
-    
+
 
     @Test
     void shouldMaintainHistoryIntegrityAfterTaskUpdate() {

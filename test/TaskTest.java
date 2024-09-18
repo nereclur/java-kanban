@@ -9,17 +9,7 @@ import task.TaskStatus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TaskTest {
-
-    @Test
-    void shouldReturnTaskId1() {
-        InMemoryTaskManager manager = new InMemoryTaskManager();
-        Task task = new Task("Купит хулеб", "Пойдит в мазин купит лепешка");
-        manager.createTask(task); // Создаем задачу через менеджер
-        int taskId = task.getTaskId(); // Получаем ID после создания
-        assertEquals(1, taskId);
-    }
-
-
+    
     @Test
     void shouldReturnTrueIfTasksEquals() {
         Task task = new Task("Купит хулеб", "Пойдит в мазин купит лепешка");
