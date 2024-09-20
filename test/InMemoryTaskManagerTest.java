@@ -1,6 +1,7 @@
 package test;
 
 import manager.InMemoryTaskManager;
+import manager.InMemoryHistoryManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
@@ -179,7 +180,7 @@ class InMemoryTaskManagerTest {
         taskManager.addTask(task);
 
         taskManager.getTaskById(task.getTaskId());
-        taskManager.getTaskById(task.getTaskId()); 
+        taskManager.getTaskById(task.getTaskId());
 
         List<Task> history = historyManager.getHistory();
         assertEquals(1, history.size());
