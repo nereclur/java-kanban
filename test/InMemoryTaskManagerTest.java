@@ -2,6 +2,8 @@ package test;
 
 import manager.InMemoryTaskManager;
 import manager.InMemoryHistoryManager;
+import manager.HistoryManager;
+import manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
