@@ -205,5 +205,5 @@ class InMemoryTaskManagerTest {
                 .count();
         assertEquals(2, uniqueTaskIds, "История должна содержать обе таски с уникальными id");
     }
-    
+
 }

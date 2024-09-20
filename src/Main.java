@@ -31,6 +31,7 @@ public class Main {
 
 
         manager.getTaskById(1);
+        manager.getTaskById(2);
         manager.getTaskById(1);
         manager.getEpicById(3);
         manager.getEpicById(3);

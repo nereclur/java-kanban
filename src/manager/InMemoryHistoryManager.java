@@ -11,7 +11,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     private Node head;
     private Node tail;
-
     private Map<Integer, Node> nodeMap;
 
     public InMemoryHistoryManager() {
@@ -19,42 +18,81 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     @Override
-    public void remove(int id) {
-        Node nodeToRemove = nodeMap.get(id);
-        if (nodeToRemove != null) {
-            removeNode(nodeToRemove);
-        }
-    }
-
-    @Override
-    public List<Task> getHistory() {
-        return getTasks();
-    }
-
-    @Override
     public void add(Task task) {
-        Node existingNode = nodeMap.get(task.getTaskId());
-        if (existingNode != null) {
-            // Обновляем существующую задачу и перемещаем её в конец списка
-            existingNode.task = task;
-            moveToTail(existingNode);
-        } else {
-            // Добавляем новую задачу в историю
-            linkLast(task);
+        if (nodeMap.containsKey(task.getTaskId())) {
+            return; // Задача уже в истории, не добавляем
         }
-    }
 
-    private void linkLast(Task task) {
         Node newNode = new Node(task);
-        if (tail == null) {
-            tail = newNode;
+        if (head == null) {
             head = newNode;
+            tail = newNode;
         } else {
             tail.next = newNode;
             newNode.prev = tail;
             tail = newNode;
         }
         nodeMap.put(task.getTaskId(), newNode);
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        List<Task> history = new ArrayList<>();
+        Node current = head;
+        while (current != null) {
+            history.add(current.task);
+            current = current.next;
+        }
+        return history;
+    }
+
+    public void remove(int id) {
+        Node nodeToRemove = nodeMap.get(id);
+        if (nodeToRemove != null) {
+            if (nodeToRemove.prev != null) {
+                nodeToRemove.prev.next = nodeToRemove.next;
+            } else {
+                head = nodeToRemove.next; // Удаляем голову
+            }
+            if (nodeToRemove.next != null) {
+                nodeToRemove.next.prev = nodeToRemove.prev;
+            } else {
+                tail = nodeToRemove.prev; // Удаляем хвост
+            }
+            nodeMap.remove(id);
+        }
+    }
+
+
+    private void linkLast(Task task) {
+        Node newNode = new Node(task);
+        if (tail == null) {
+            head = newNode;
+            tail = newNode;
+        } else {
+            tail.next = newNode;
+            newNode.prev = tail;
+            tail = newNode;
+        }
+        nodeMap.put(task.getTaskId(), newNode);
+    }
+
+    private void removeNode(Node node) {
+        if (node == null) return;
+
+        if (node.prev != null) {
+            node.prev.next = node.next;
+        } else {
+            head = node.next; // Если это голова
+        }
+
+        if (node.next != null) {
+            node.next.prev = node.prev;
+        } else {
+            tail = node.prev; // Если это хвост
+        }
+
+        nodeMap.remove(node.task.getTaskId());
     }
 
     private List<Task> getTasks() {
@@ -67,48 +105,12 @@ public class InMemoryHistoryManager implements HistoryManager {
         return tasks;
     }
 
-    private void removeNode(Node node) {
-        if (node == head) {
-            head = node.next;
-            if (head != null) {
-                head.prev = null;
-            }
-        } else if (node == tail) {
-            tail = node.prev;
-            if (tail != null) {
-                tail.next = null;
-            }
-        } else {
-            node.prev.next = node.next;
-            node.next.prev = node.prev;
-        }
-        nodeMap.remove(node.task.getTaskId());
-    }
-
-    private void moveToTail(Node node) {
-        if (node != tail) {
-            if (node == head) {
-                head = node.next;
-                if (head != null) {
-                    head.prev = null;
-                }
-            } else {
-                node.prev.next = node.next;
-                node.next.prev = node.prev;
-            }
-            tail.next = node;
-            node.prev = tail;
-            node.next = null;
-            tail = node;
-        }
-    }
-
-    class Node {
+    private static class Node {
         Task task;
         Node next;
         Node prev;
 
-        public Node(Task task) {
+        Node(Task task) {
             this.task = task;
         }
     }
