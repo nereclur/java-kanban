@@ -179,7 +179,7 @@ class InMemoryTaskManagerTest {
         HistoryManager historyManager = new InMemoryHistoryManager();
 
         Task task = new Task("Test Task", "Описание");
-        taskManager.addTask(task);
+        taskManager.createTask(task);
 
         taskManager.getTaskById(task.getTaskId());
         taskManager.getTaskById(task.getTaskId());
