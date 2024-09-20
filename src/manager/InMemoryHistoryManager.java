@@ -25,7 +25,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-
         Node existingNode = tasksById.get(task.getTaskId());
         if (existingNode != null) {
             remove(existingNode.task.getTaskId());
@@ -41,6 +40,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
         tasksById.put(task.getTaskId(), newNode);
     }
+
 
 
     @Override
