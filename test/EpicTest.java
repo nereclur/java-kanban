@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import task.Epic;
 import task.Subtask;
+import task.Task;
 
 import java.util.List;
 
@@ -25,11 +26,11 @@ class EpicTest {
     @Test
     void removeSubtasks() {
         Subtask subtaskToRemove = new Subtask("Subtask 2", "Description of subtask 2", 2);
-        epic.removeSubtasks(subtaskToRemove);
-        assertFalse(epic.getSubtasks().contains(subtaskToRemove), "Subtask should be removed");
-        assertTrue(epic.getSubtasks().contains(new Subtask("Subtask 1", "Description of subtask 1", 1)),
+        epic1.removeSubtasks(subtaskToRemove);
+        assertFalse(epic1.getSubtasks().contains(subtaskToRemove), "Subtask should be removed");
+        assertTrue(epic1.getSubtasks().contains(new Subtask("Subtask 1", "Description of subtask 1", 1)),
                 "Subtask 1 должен оставаться в списке");
-        assertTrue(epic.getSubtasks().contains(new Subtask("Subtask 3", "Description of subtask 3", 3)),
+        assertTrue(epic1.getSubtasks().contains(new Subtask("Subtask 3", "Description of subtask 3", 3)),
                 "Subtask 3 олжен оставаться в списке");
     }
 }
