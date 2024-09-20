@@ -171,17 +171,21 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldNotDuplicateTasksInHistory() {
-        Task task = new Task("Test Task", "Описание");
-        manager.createTask(task);
-        manager.getTaskById(task.getTaskId()); // Добавляем задачу в историю при получении по ID
-        manager.getTaskById(task.getTaskId()); // Повторный просмотр, который не должен добавлять дубликат
+    public void shouldNotDuplicateTasksInHistory() {
+        TaskManager taskManager = new InMemoryTaskManager();
+        HistoryManager historyManager = new InMemoryHistoryManager();
 
-        List<Task> history = manager.getHistory();
-        // Проверяем, что в истории только один экземпляр задачи
-        assertEquals(1, history.size(), "В истории должна быть только одна таска");
-        assertEquals(task.getTaskId(), history.get(0).getTaskId(), "Идентификатор первой таски в истории должен соответствовать созданной таске");
+        Task task = new Task("Test Task", "Описание", 1);
+        taskManager.addTask(task);
+
+        taskManager.getTaskById(task.getTaskId());
+        taskManager.getTaskById(task.getTaskId()); /
+
+        List<Task> history = historyManager.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(task, history.get(0));
     }
+
 
     @Test
     void shouldRemoveTaskFromHistory() {
