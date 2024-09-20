@@ -120,7 +120,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     void shouldContainTasksAfterReceivingThem() {
-        Task task = new Task("Test Task", "Description");
+        Task task = new Task("Test Task", "Описание");
         manager.createTask(task);
         manager.getTaskById(task.getTaskId());
         List<Task> history = manager.getHistory();
@@ -137,7 +137,8 @@ class InMemoryTaskManagerTest {
         manager.removeSubtaskById(subtask.getTaskId());
 
         Epic updatedEpic = manager.getEpicById(epic.getTaskId());
-        assertTrue(updatedEpic.getSubtasks().isEmpty());
+        assertTrue(updatedEpic.getSubtasks().isEmpty(),
+                "Эпик не должен содержать старые id сабтасок после их удаления");
     }
 
     @Test
@@ -149,21 +150,67 @@ class InMemoryTaskManagerTest {
         manager.removeSubtaskById(subtask.getTaskId());
 
         Epic updatedEpic = manager.getEpicById(epic.getTaskId());
-        assertEquals(TaskStatus.NEW, updatedEpic.getStatus());
+        assertEquals(TaskStatus.NEW, updatedEpic.getStatus(),
+                "Статус эпика должен обновиться после удаление задачи");
     }
 
 
     @Test
     void shouldMaintainHistoryIntegrityAfterTaskUpdate() {
-        Task task = new Task("Test Task", "Description");
+        Task task = new Task("Test Task", "Описание");
         manager.createTask(task);
         manager.getTaskById(task.getTaskId());
 
-        Task updatedTask = new Task("Updated Task", "New Description");
+        Task updatedTask = new Task("Updated Task", "Новое описание");
         manager.updateTask(updatedTask, task.getTaskId());
 
         List<Task> history = manager.getHistory();
         assertEquals(1, history.size());
-        assertEquals(updatedTask.getTaskId(), history.get(0).getTaskId());
+        assertEquals(updatedTask.getTaskId(), history.get(0).getTaskId(),
+                "История должна содержать таску с обновленным описанием задачи");
+    }
+
+    @Test
+    void shouldNotDuplicateTasksInHistory() {
+        Task task = new Task("Test Task", "Описание");
+        manager.createTask(task);
+        manager.getTaskById(task.getTaskId());
+        manager.getTaskById(task.getTaskId()); // Повторный просмотр
+
+        List<Task> history = manager.getHistory();
+        assertEquals(1, history.size(), "В истории не должны храниться дубли тасок");
+        assertEquals(task.getTaskId(), history.get(0).getTaskId());
+    }
+
+    @Test
+    void shouldRemoveTaskFromHistory() {
+        Task task = new Task("Test Task", "Описание");
+        manager.createTask(task);
+        manager.getTaskById(task.getTaskId());
+        manager.removeTaskById(task.getTaskId());
+
+        List<Task> history = manager.getHistory();
+        assertFalse(history.contains(task), "Удаленные таски не должны быть в истории");
+    }
+
+    @Test
+    void shouldMaintainUniqueTaskIdsInHistory() {
+        Task task1 = new Task("Test Task 1", "Описание 1");
+        Task task2 = new Task("Test Task 2", "Описание 2");
+        manager.createTask(task1);
+        manager.createTask(task2);
+        manager.getTaskById(task1.getTaskId());
+        manager.getTaskById(task2.getTaskId());
+
+        List<Task> history = manager.getHistory();
+        assertEquals(2, history.size(), "История должна содержать обе таски");
+
+        int taskId1 = task1.getTaskId();
+        int taskId2 = task2.getTaskId();
+        long uniqueTaskIds = history.stream()
+                .mapToInt(Task::getTaskId)
+                .distinct()
+                .count();
+        assertEquals(2, uniqueTaskIds, "История должна содержать обе таски с уникальными id");
     }
 }

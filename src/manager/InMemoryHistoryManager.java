@@ -25,9 +25,12 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
-        if (tasksById.containsKey(task.getTaskId())) {
-            remove(tasksById.get(task.getTaskId()));
+
+        Node existingNode = tasksById.get(task.getTaskId());
+        if (existingNode != null) {
+            remove(existingNode.task.getTaskId());
         }
+
         Node newNode = new Node(task);
         if (tail == null) {
             head = tail = newNode;
@@ -38,6 +41,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
         tasksById.put(task.getTaskId(), newNode);
     }
+
 
     @Override
     public List<Task> getHistory() {
@@ -50,19 +54,34 @@ public class InMemoryHistoryManager implements HistoryManager {
         return tasks;
     }
 
-    public void remove(Node node) {
-        if (node == head && node == tail) {
-            head = tail = null;
-        } else if (node == head) {
-            head = head.next;
-            head.prev = null;
-        } else if (node == tail) {
-            tail = tail.prev;
-            tail.next = null;
-        } else {
-            node.prev.next = node.next;
-            node.next.prev = node.prev;
+    @Override
+    public void remove(int taskId) {
+        Node nodeToRemove = tasksById.get(taskId);
+        if (nodeToRemove != null) {
+            // Узел найден, продолжаем удаление
+
+            if (nodeToRemove == head) {
+                // Узел является головой списка
+                head = head.next;
+                if (head != null) {
+                    head.prev = null;
+                }
+            } else if (nodeToRemove == tail) {
+                // Узел является хвостом списка
+                tail = tail.prev;
+                if (tail != null) {
+                    tail.next = null;
+                }
+            } else {
+                // Узел находится в середине списка
+                nodeToRemove.prev.next = nodeToRemove.next;
+                nodeToRemove.next.prev = nodeToRemove.prev;
+            }
+
+            // Удаляем узел из мапы по id
+            tasksById.remove(taskId);
         }
-        tasksById.remove(node.task.getTaskId());
     }
+
+
 }

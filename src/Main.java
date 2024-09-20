@@ -1,3 +1,4 @@
+import manager.InMemoryHistoryManager;
 import manager.InMemoryTaskManager;
 import task.Epic;
 import task.Subtask;
@@ -6,6 +7,7 @@ import task.Task;
 public class Main {
     public static void main(String[] args) {
         InMemoryTaskManager manager = new InMemoryTaskManager();
+        InMemoryHistoryManager historyManager = new InMemoryHistoryManager();
 
 
         Task task1 = new Task("Задача 1", "Описание задачи 1");
@@ -33,6 +35,13 @@ public class Main {
         manager.getSubtaskById(5);
 
 
+        for (Task task : manager.getHistory()) {
+            System.out.println(task);
+        }
+
+        manager.removeTaskById(task1.getTaskId());
+
+        System.out.println("История задач после удаления:");
         for (Task task : manager.getHistory()) {
             System.out.println(task);
         }

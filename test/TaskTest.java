@@ -9,7 +9,7 @@ import task.TaskStatus;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TaskTest {
-    
+
     @Test
     void shouldReturnTrueIfTasksEquals() {
         Task task = new Task("Купит хулеб", "Пойдит в мазин купит лепешка");
