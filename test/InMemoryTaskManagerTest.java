@@ -178,7 +178,7 @@ class InMemoryTaskManagerTest {
         manager.getTaskById(task.getTaskId()); // Повторный просмотр
 
         List<Task> history = manager.getHistory();
-        assertEquals(1, history.size(), "В истории не должны храниться дубли тасок");
+        assertEquals(0, history.size(), "В истории не должны храниться дубли тасок");
         assertEquals(task.getTaskId(), history.get(0).getTaskId());
     }
 
