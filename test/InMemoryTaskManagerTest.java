@@ -179,7 +179,7 @@ class InMemoryTaskManagerTest {
         taskManager.addTask(task);
 
         taskManager.getTaskById(task.getTaskId());
-        taskManager.getTaskById(task.getTaskId()); /
+        taskManager.getTaskById(task.getTaskId()); 
 
         List<Task> history = historyManager.getHistory();
         assertEquals(1, history.size());
