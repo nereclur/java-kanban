@@ -176,7 +176,7 @@ class InMemoryTaskManagerTest {
         TaskManager taskManager = new InMemoryTaskManager();
         HistoryManager historyManager = new InMemoryHistoryManager();
 
-        Task task = new Task("Test Task", "Описание", 1);
+        Task task = new Task("Test Task", "Описание");
         taskManager.addTask(task);
 
         taskManager.getTaskById(task.getTaskId());
