@@ -37,7 +37,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
         if (task != null) {
-            historyManager.add(task); // Это безопасно, так как InMemoryHistoryManager поддерживает уникальность задач
+            historyManager.add(task);
         }
         return task;
     }

@@ -2,49 +2,62 @@ package manager;
 
 import task.Task;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
 import java.util.ArrayList;
-
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private static class Node {
-        Task task;
-        Node prev;
-        Node next;
-
-        public Node(Task task) {
-            this.task = task;
-        }
-    }
 
     private Node head;
     private Node tail;
-    private Map<Integer, Node> tasksById = new HashMap<>();
+
+    private Map<Integer, Node> nodeMap;
+
+    public InMemoryHistoryManager() {
+        this.nodeMap = new HashMap<>();
+    }
+
+    @Override
+    public void remove(int id) {
+        Node nodeToRemove = nodeMap.get(id);
+        if (nodeToRemove != null) {
+            removeNode(nodeToRemove);
+        }
+    }
+
+    @Override
+    public List<Task> getHistory() {
+        return getTasks();
+    }
 
     @Override
     public void add(Task task) {
-        Node existingNode = tasksById.get(task.getTaskId());
+        Node existingNode = nodeMap.get(task.getTaskId());
         if (existingNode != null) {
-            remove(existingNode.task.getTaskId());
+            // Обновляем существующую задачу и перемещаем её в конец списка
+            existingNode.task = task;
+            moveToTail(existingNode);
+        } else {
+            // Добавляем новую задачу в историю
+            linkLast(task);
         }
+    }
 
+    private void linkLast(Task task) {
         Node newNode = new Node(task);
         if (tail == null) {
-            head = tail = newNode;
+            tail = newNode;
+            head = newNode;
         } else {
             tail.next = newNode;
             newNode.prev = tail;
             tail = newNode;
         }
-        tasksById.put(task.getTaskId(), newNode);
+        nodeMap.put(task.getTaskId(), newNode);
     }
 
-
-
-    @Override
-    public List<Task> getHistory() {
+    private List<Task> getTasks() {
         List<Task> tasks = new ArrayList<>();
         Node current = head;
         while (current != null) {
@@ -54,34 +67,49 @@ public class InMemoryHistoryManager implements HistoryManager {
         return tasks;
     }
 
-    @Override
-    public void remove(int taskId) {
-        Node nodeToRemove = tasksById.get(taskId);
-        if (nodeToRemove != null) {
-            // Узел найден, продолжаем удаление
+    private void removeNode(Node node) {
+        if (node == head) {
+            head = node.next;
+            if (head != null) {
+                head.prev = null;
+            }
+        } else if (node == tail) {
+            tail = node.prev;
+            if (tail != null) {
+                tail.next = null;
+            }
+        } else {
+            node.prev.next = node.next;
+            node.next.prev = node.prev;
+        }
+        nodeMap.remove(node.task.getTaskId());
+    }
 
-            if (nodeToRemove == head) {
-                // Узел является головой списка
-                head = head.next;
+    private void moveToTail(Node node) {
+        if (node != tail) {
+            if (node == head) {
+                head = node.next;
                 if (head != null) {
                     head.prev = null;
                 }
-            } else if (nodeToRemove == tail) {
-                // Узел является хвостом списка
-                tail = tail.prev;
-                if (tail != null) {
-                    tail.next = null;
-                }
             } else {
-                // Узел находится в середине списка
-                nodeToRemove.prev.next = nodeToRemove.next;
-                nodeToRemove.next.prev = nodeToRemove.prev;
+                node.prev.next = node.next;
+                node.next.prev = node.prev;
             }
-
-            // Удаляем узел из мапы по id
-            tasksById.remove(taskId);
+            tail.next = node;
+            node.prev = tail;
+            node.next = null;
+            tail = node;
         }
     }
 
+    class Node {
+        Task task;
+        Node next;
+        Node prev;
 
+        public Node(Task task) {
+            this.task = task;
+        }
+    }
 }

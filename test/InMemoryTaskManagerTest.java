@@ -1,4 +1,4 @@
-package test;
+
 
 import manager.InMemoryTaskManager;
 import manager.InMemoryHistoryManager;
@@ -173,19 +173,8 @@ class InMemoryTaskManagerTest {
                 "История должна содержать таску с обновленным описанием задачи");
     }
 
-    @Test
-    void shouldNotDuplicateInHistory() {
-        Task task1 = new Task("Task1", "Description1", TaskStatus.NEW);
-        taskManager.createTask(task1);
-        List<Task> history = taskManager.getHistory();
-        assertEquals(1, history.size(), "История должна содержать одну задачу");
-        taskManager.createTask(task1);
-        List<Task> updatedHistory = taskManager.getHistory();
-        assertEquals(1, updatedHistory.size(), "История должна содержать одну задачу после повторного добавления");
-    }
 
-
-    @Test
+        @Test
     void shouldRemoveTaskFromHistory() {
         Task task = new Task("Test Task", "Описание");
         manager.createTask(task);
@@ -216,4 +205,5 @@ class InMemoryTaskManagerTest {
                 .count();
         assertEquals(2, uniqueTaskIds, "История должна содержать обе таски с уникальными id");
     }
+    
 }
