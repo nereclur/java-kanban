@@ -174,19 +174,14 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    public void shouldNotDuplicateTasksInHistory() {
-        TaskManager taskManager = new InMemoryTaskManager();
-        HistoryManager historyManager = new InMemoryHistoryManager();
-
-        Task task = new Task("Test Task", "Описание");
-        taskManager.createTask(task);
-
-        taskManager.getTaskById(task.getTaskId());
-        taskManager.getTaskById(task.getTaskId());
-
-        List<Task> history = historyManager.getHistory();
-        assertEquals(1, history.size());
-        assertEquals(task, history.get(0));
+    void shouldNotDuplicateInHistory() {
+        Task task1 = new Task("Task1", "Description1", TaskStatus.NEW);
+        taskManager.createTask(task1);
+        List<Task> history = taskManager.getHistory();
+        assertEquals(1, history.size(), "История должна содержать одну задачу");
+        taskManager.createTask(task1);
+        List<Task> updatedHistory = taskManager.getHistory();
+        assertEquals(1, updatedHistory.size(), "История должна содержать одну задачу после повторного добавления");
     }
 
 
