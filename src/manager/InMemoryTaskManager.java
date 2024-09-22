@@ -1,9 +1,6 @@
 package manager;
 
-import task.Epic;
-import task.Subtask;
-import task.Task;
-import task.TaskStatus;
+import task.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +17,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createTask(Task task) {
         task.setTaskId(id++);
+        task.setType(TypeTask.TASK);
         tasks.put(task.getTaskId(), task);
     }
 
@@ -69,6 +67,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createEpic(Epic epic) {
         epic.setTaskId(id++);
+        epic.setType(TypeTask.EPIC);
         epics.put(epic.getTaskId(), epic);
     }
 
@@ -111,6 +110,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createSubtask(Subtask subtask) {
         subtask.setTaskId(id++);
+        subtask.setType(TypeTask.SUBTASK);
         subtasks.put(subtask.getTaskId(), subtask);
 
         Epic epic = epics.get(subtask.getEpicId());
