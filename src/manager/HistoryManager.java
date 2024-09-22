@@ -3,7 +3,7 @@ package manager;
 import task.Task;
 
 import java.util.List;
-import java.util.Objects;
+
 
 public interface HistoryManager {
 
@@ -11,5 +11,5 @@ public interface HistoryManager {
 
     List<Task> getHistory();
 
-
+    void remove(int id);
 }

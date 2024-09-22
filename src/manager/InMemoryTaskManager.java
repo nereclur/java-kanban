@@ -42,6 +42,7 @@ public class InMemoryTaskManager implements TaskManager {
         return task;
     }
 
+
     @Override
     public void updateTask(Task task, int id) {
         Task updatedTask = tasks.get(id);
@@ -53,8 +54,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTaskById(int id) {
+        // Удаляем задачу из основного хранилища
         tasks.remove(id);
+        // Также удаляем задачу из истории, если она там есть
+        historyManager.remove(id);
     }
+
 
     @Override
     public List<Epic> getAllEpics() {
@@ -97,7 +102,9 @@ public class InMemoryTaskManager implements TaskManager {
         if (epic != null) {
             for (Subtask subtask : epic.getSubtasks()) {
                 subtasks.remove(subtask.getTaskId());
+                historyManager.remove(subtask.getTaskId());
             }
+            historyManager.remove(id);
         }
     }
 
@@ -158,6 +165,7 @@ public class InMemoryTaskManager implements TaskManager {
             if (epic != null) {
                 epic.removeSubtasks(subtask);
             }
+            historyManager.remove(id);
         }
     }
 

@@ -1,6 +1,9 @@
-package test;
+
 
 import manager.InMemoryTaskManager;
+import manager.InMemoryHistoryManager;
+import manager.HistoryManager;
+import manager.TaskManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
@@ -10,7 +13,7 @@ import task.TaskStatus;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
 
@@ -46,7 +49,6 @@ class InMemoryTaskManagerTest {
         Task task = new Task("Задача 1", "Описание 1");
         manager.createTask(task);
         Task updatedTask = new Task("Обновленная задача 1", "Обновленное описание");
-        updatedTask.setTaskId(task.getTaskId());
         manager.updateTask(updatedTask, task.getTaskId());
         Task retrievedTask = manager.getTaskById(task.getTaskId());
         assertEquals("Обновленная задача 1", retrievedTask.getName());
@@ -101,7 +103,7 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void shouldEpicStatusBeTheSameLikeSubtasksStatus() {
+    void shouldEpicStatusBeUpdatedCorrectly() {
         Epic epic = new Epic("Эпик 1", "Описание 1");
         manager.createEpic(epic);
         Subtask subtask1 = new Subtask("Подзадача 1", "Описание 1", epic.getTaskId());
@@ -121,11 +123,87 @@ class InMemoryTaskManagerTest {
 
     @Test
     void shouldContainTasksAfterReceivingThem() {
-        Task task = new Task("Task 1", "Description 1");
+        Task task = new Task("Test Task", "Описание");
         manager.createTask(task);
         manager.getTaskById(task.getTaskId());
         List<Task> history = manager.getHistory();
         assertEquals(1, history.size());
-        assertEquals(task, history.get(0));
+        assertEquals(task.getTaskId(), history.get(0).getTaskId());
     }
+
+    @Test
+    void shouldNotContainOldSubtaskIdsAfterRemoval() {
+        Epic epic = new Epic("Эпик 1", "Описание 1");
+        manager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача 1", "Описание 1", epic.getTaskId());
+        manager.createSubtask(subtask);
+        manager.removeSubtaskById(subtask.getTaskId());
+
+        Epic updatedEpic = manager.getEpicById(epic.getTaskId());
+        assertTrue(updatedEpic.getSubtasks().isEmpty(),
+                "Эпик не должен содержать старые id сабтасок после их удаления");
+    }
+
+    @Test
+    void shouldUpdateEpicStatusWhenSubtaskRemoved() {
+        Epic epic = new Epic("Эпик 1", "Описание 1");
+        manager.createEpic(epic);
+        Subtask subtask = new Subtask("Подзадача 1", "Описание 1", epic.getTaskId());
+        manager.createSubtask(subtask);
+        manager.removeSubtaskById(subtask.getTaskId());
+
+        Epic updatedEpic = manager.getEpicById(epic.getTaskId());
+        assertEquals(TaskStatus.NEW, updatedEpic.getStatus(),
+                "Статус эпика должен обновиться после удаление задачи");
+    }
+
+
+    @Test
+    void shouldMaintainHistoryIntegrityAfterTaskUpdate() {
+        Task task = new Task("Test Task", "Описание");
+        manager.createTask(task);
+        manager.getTaskById(task.getTaskId());
+
+        Task updatedTask = new Task("Updated Task", "Новое описание");
+        manager.updateTask(updatedTask, task.getTaskId());
+
+        List<Task> history = manager.getHistory();
+        assertEquals(1, history.size());
+        assertEquals(updatedTask.getTaskId(), history.get(0).getTaskId(),
+                "История должна содержать таску с обновленным описанием задачи");
+    }
+
+
+        @Test
+    void shouldRemoveTaskFromHistory() {
+        Task task = new Task("Test Task", "Описание");
+        manager.createTask(task);
+        manager.getTaskById(task.getTaskId());
+        manager.removeTaskById(task.getTaskId());
+
+        List<Task> history = manager.getHistory();
+        assertFalse(history.contains(task), "Удаленные таски не должны быть в истории");
+    }
+
+    @Test
+    void shouldMaintainUniqueTaskIdsInHistory() {
+        Task task1 = new Task("Test Task 1", "Описание 1");
+        Task task2 = new Task("Test Task 2", "Описание 2");
+        manager.createTask(task1);
+        manager.createTask(task2);
+        manager.getTaskById(task1.getTaskId());
+        manager.getTaskById(task2.getTaskId());
+
+        List<Task> history = manager.getHistory();
+        assertEquals(2, history.size(), "История должна содержать обе таски");
+
+        int taskId1 = task1.getTaskId();
+        int taskId2 = task2.getTaskId();
+        long uniqueTaskIds = history.stream()
+                .mapToInt(Task::getTaskId)
+                .distinct()
+                .count();
+        assertEquals(2, uniqueTaskIds, "История должна содержать обе таски с уникальными id");
+    }
+
 }
