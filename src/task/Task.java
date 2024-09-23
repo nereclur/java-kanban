@@ -52,7 +52,9 @@ public class Task {
         this.status = status;
     }
 
-    public void setType(TypeTask type) { this.type = type; }
+    public void setType(TypeTask type) {
+        this.type = type;
+    }
 
     @Override
     public boolean equals(Object o) {
