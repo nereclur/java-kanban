@@ -29,7 +29,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             Node removingNode = historyMap.remove(id);
             removeNode(removingNode);
         } else {
-            System.out.println("History map not contains task with current id");
+            System.out.println("History map not contains task with id");
         }
     }
 
