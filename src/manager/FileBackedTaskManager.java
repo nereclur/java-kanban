@@ -16,30 +16,28 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         FileBackedTaskManager manager = new FileBackedTaskManager(file);
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            br.readLine();
+            br.readLine(); // Пропустить заголовок
             String line;
-            List<Subtask> subtasks = new ArrayList<>();
 
             while ((line = br.readLine()) != null) {
                 Task task = taskFromString(line);
                 if (task.getType().equals("EPIC")) {
                     manager.createEpic((Epic) task);
                 } else if (task.getType().equals("SUBTASK")) {
-                    subtasks.add((Subtask) task);
+                    Subtask subtask = (Subtask) task;
+                    manager.createSubtask(subtask);
+                    // Добавляем подзадачу в эпик
+                    manager.getEpicById(subtask.getEpicId()).addSubtask(subtask);
                 } else {
                     manager.createTask(task);
                 }
-            }
-
-            // Теперь свяжите подзадачи с их эпиками
-            for (Subtask subtask : subtasks) {
-                manager.createSubtask(subtask);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return manager;
     }
+
 
     private void save() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
@@ -74,14 +72,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
         switch (type) {
             case "TASK":
-                task = new Task(name, description, TypeTask.TASK);
+                task = new Task(name, description);
                 break;
             case "EPIC":
-                task = new Epic(name, description, TypeTask.EPIC);
+                task = new Epic(name, description);
                 break;
             case "SUBTASK":
                 int epicId = Integer.parseInt(fields[5]);
-                task = new Subtask(name, description, epicId, TypeTask.SUBTASK);
+                task = new Subtask(name, description, epicId);
                 break;
         }
 

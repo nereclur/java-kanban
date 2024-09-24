@@ -6,8 +6,8 @@ import java.util.List;
 public class Epic extends Task {
     private final List<Subtask> subtasks;
 
-    public Epic(String name, String description, TypeTask typeTask) {
-        super(name, description, typeTask);
+    public Epic(String name, String description) {
+        super(name, description);
         this.subtasks = new ArrayList<>();
     }
 
@@ -21,6 +21,11 @@ public class Epic extends Task {
 
     public void removeSubtasks(Subtask subtask) {
         subtasks.remove(subtask);
+    }
+
+    @Override
+    public TypeTask getType() {
+        return TypeTask.EPIC;
     }
 
 

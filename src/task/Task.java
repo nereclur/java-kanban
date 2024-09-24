@@ -7,13 +7,11 @@ public class Task {
     private String description;
     private int taskId;
     private TaskStatus status;
-    private TypeTask type;
 
-    public Task(String name, String description, TypeTask type) {
+    public Task(String name, String description) {
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
-        this.type = type;
     }
 
     public String getName() {
@@ -33,7 +31,7 @@ public class Task {
     }
 
     public TypeTask getType() {
-        return type;
+        return TypeTask.TASK;
     }
 
     public void setName(String name) {
@@ -73,7 +71,7 @@ public class Task {
                 ", description='" + description + '\'' +
                 ", taskId=" + taskId +
                 ", status=" + status +
-                ", type=" + type +
+                ", type=" + getType() +
                 '}';
     }
 }
