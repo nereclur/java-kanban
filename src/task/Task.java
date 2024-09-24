@@ -9,11 +9,11 @@ public class Task {
     private TaskStatus status;
     private TypeTask type;
 
-    public Task(String name, String description) {
+    public Task(String name, String description, TypeTask type) {
         this.name = name;
         this.description = description;
         this.status = TaskStatus.NEW;
-        this.type = TypeTask.TASK;
+        this.type = type;
     }
 
     public String getName() {
@@ -52,9 +52,6 @@ public class Task {
         this.status = status;
     }
 
-    public void setType(TypeTask type) {
-        this.type = type;
-    }
 
     @Override
     public boolean equals(Object o) {
