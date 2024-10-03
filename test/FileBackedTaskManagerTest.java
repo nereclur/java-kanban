@@ -17,22 +17,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class FileBackedTaskManagerTest {
 
     private FileBackedTaskManager taskManager;
-
     private File file;
 
     @BeforeEach
-    void init() {
-        file = null;
-        try {
-            file = java.io.File.createTempFile("backup", "csv");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+    void init() throws IOException {
+        file = java.io.File.createTempFile("backup", "csv");
         taskManager = Managers.getFileBackedTaskManager(file);
     }
 
     @Test
-    void save_shouldSaveEmptyFile() {
+    void save_shouldSaveEmptyFile() throws IOException {
         // prepare
         Task task = null;
 
@@ -40,27 +34,18 @@ public class FileBackedTaskManagerTest {
         taskManager.addNewTask(task);
 
         // check
-        try {
-            assertTrue(Files.readString(file.toPath()).isEmpty());
-
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
+        assertTrue(Files.readString(file.toPath()).isEmpty());
     }
 
     @Test
-    void save_shouldLoadEmptyFile() {
+    void save_shouldLoadEmptyFile() throws ManagerLoadException {
         // prepare
         Task task = null;
 
         // do
         taskManager.addNewTask(task);
         FileBackedTaskManager newManager = Managers.getFileBackedTaskManager(file);
-        try {
-            newManager.loadFromFile(file);
-        } catch (ManagerLoadException exception) {
-            exception.printStackTrace();
-        }
+        newManager.loadFromFile(file);
 
         // check
         assertTrue(newManager.idTask.isEmpty());
@@ -69,7 +54,7 @@ public class FileBackedTaskManagerTest {
     }
 
     @Test
-    void save_shouldSaveFewTasksInFile() {
+    void save_shouldSaveFewTasksInFile() throws IOException {
         // prepare
         Task task = new Task("Task 1", "Task Description");
         Epic epic = new Epic("Epic 1", "Epic Description");
@@ -77,7 +62,6 @@ public class FileBackedTaskManagerTest {
         // do
         Task actualTask = taskManager.addNewTask(task);
         Epic actualEpic = taskManager.addNewTask(epic);
-
         Subtask subtask = new Subtask("Subtask 1", "Subtask Description", epic.getId());
         Subtask actualSub = taskManager.addNewTask(subtask);
 
@@ -85,26 +69,21 @@ public class FileBackedTaskManagerTest {
         boolean isTaskInFile = false;
         boolean isEpicInFile = false;
         boolean isSubInFile = false;
-        try {
-            for (String s : Files.readAllLines(file.toPath())) {
-                if (s.contains(actualTask.getDescription())) {
-                    isTaskInFile = true;
-                } else if (s.contains(actualEpic.getDescription())) {
-                    isEpicInFile = true;
-                } else if (s.contains(actualSub.getDescription())) {
-                    isSubInFile = true;
-                }
+        for (String s : Files.readAllLines(file.toPath())) {
+            if (s.contains(actualTask.getDescription())) {
+                isTaskInFile = true;
+            } else if (s.contains(actualEpic.getDescription())) {
+                isEpicInFile = true;
+            } else if (s.contains(actualSub.getDescription())) {
+                isSubInFile = true;
             }
-        } catch (IOException ex) {
-            ex.printStackTrace();
         }
-
 
         assertTrue(isTaskInFile && isEpicInFile && isSubInFile);
     }
 
     @Test
-    void save_shouldLoadTasks() {
+    void save_shouldLoadTasks() throws ManagerLoadException {
         // prepare
         Task task = new Task("Task 1", "Task Description");
         Epic epic = new Epic("Epic 1", "Epic Description");
@@ -112,18 +91,11 @@ public class FileBackedTaskManagerTest {
         // do
         Task actualTask = taskManager.addNewTask(task);
         Epic actualEpic = taskManager.addNewTask(epic);
-
         Subtask subtask = new Subtask("Subtask 1", "Subtask Description", epic.getId());
         Subtask actualSub = taskManager.addNewTask(subtask);
 
         // check
-        FileBackedTaskManager manager = null;
-
-        try {
-            manager = taskManager.loadFromFile(file);
-        } catch (ManagerLoadException | NullPointerException ex) {
-            ex.printStackTrace();
-        }
+        FileBackedTaskManager manager = taskManager.loadFromFile(file);
 
         Task loadTask = manager.getTask(0);
         Epic loadEpic = manager.getEpic(1);

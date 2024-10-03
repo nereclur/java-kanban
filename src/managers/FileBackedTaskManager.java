@@ -55,7 +55,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
 
         } catch (IOException ex) {
-            throw new ManagerSaveException(ex.getMessage());
+            throw new ManagerSaveException("Ошибка записи задач в файл");
         }
     }
 
@@ -91,47 +91,52 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTaskManager loadFromFile(File file) throws ManagerLoadException {
-
         Map<Integer, Task> tasks = new HashMap<>();
         Map<Integer, Subtask> subtasks = new HashMap<>();
         Map<Integer, Epic> epics = new HashMap<>();
         int maxId = 0;
 
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            Task task = null;
-            while (br.ready()) {
-                String currLine = br.readLine();
-                if (!currLine.startsWith("ID")) {
-                    task = fromString(currLine);
+            String currLine;
+            while ((currLine = br.readLine()) != null) {
+                if (currLine.isEmpty() || currLine.startsWith("ID")) {
+                    continue;
                 }
 
+                Task task = fromString(currLine);
                 if (task != null) {
                     maxId = Math.max(maxId, task.getId());
 
                     switch (task.getType()) {
                         case TASK:
-                            tasks.put(task.getId(), task); // прибавляем taskId на случай если уже есть задачи
+                            tasks.put(task.getId(), task);
                             break;
                         case SUBTASK:
                             subtasks.put(task.getId(), (Subtask) task);
                             break;
                         case EPIC:
                             epics.put(task.getId(), (Epic) task);
+                            break;
                     }
                 }
             }
 
             for (Subtask sub : subtasks.values()) {
                 Epic epic = epics.get(sub.getEpicId());
-                epic.addSubtask(sub);
+                if (epic != null) {
+                    epic.addSubtask(sub);
+                } else {
+                    throw new ManagerLoadException("Epic not found for subtask with id: " + sub.getId());
+                }
             }
 
         } catch (IOException ex) {
-            throw new ManagerLoadException(ex.getMessage());
+            throw new ManagerLoadException("Error loading tasks from file: " + ex.getMessage());
         }
 
         return new FileBackedTaskManager(file, tasks, epics, subtasks, maxId);
     }
+
 
     @Override
     public Task addNewTask(Task newTask) {
@@ -213,7 +218,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public Task deleteTask(Integer taskId) {
-        Task task =  super.deleteTask(taskId);
+        Task task = super.deleteTask(taskId);
 
         try {
             save();
