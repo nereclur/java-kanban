@@ -11,8 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class FileBackedTaskManagerTest {
 
@@ -21,36 +20,32 @@ public class FileBackedTaskManagerTest {
 
     @BeforeEach
     void init() throws IOException {
-        file = java.io.File.createTempFile("backup", "csv");
+        file = File.createTempFile("backup", "csv");
         taskManager = Managers.getFileBackedTaskManager(file);
     }
 
     @Test
     void save_shouldSaveEmptyFile() throws IOException {
-        // prepare
-        Task task = null;
-
         // do
-        taskManager.addNewTask(task);
+        taskManager.deleteAllTasks();  // убедимся, что все задачи удалены
 
         // check
-        assertTrue(Files.readString(file.toPath()).isEmpty());
+        assertTrue(Files.readString(file.toPath()).isEmpty(), "Файл должен быть пустым");
     }
 
     @Test
-    void save_shouldLoadEmptyFile() throws ManagerLoadException {
+    void save_shouldLoadEmptyFile() throws IOException, ManagerLoadException {
         // prepare
-        Task task = null;
+        taskManager.deleteAllTasks();  // убедимся, что все задачи удалены
 
         // do
-        taskManager.addNewTask(task);
         FileBackedTaskManager newManager = Managers.getFileBackedTaskManager(file);
         newManager.loadFromFile(file);
 
         // check
-        assertTrue(newManager.idTask.isEmpty());
-        assertTrue(newManager.idEpic.isEmpty());
-        assertTrue(newManager.idSubtask.isEmpty());
+        assertTrue(newManager.getAllTasks().isEmpty(), "Список задач должен быть пустым");
+        assertTrue(newManager.getAllEpic().isEmpty(), "Список эпиков должен быть пустым");
+        assertTrue(newManager.getAllSubtasks().isEmpty(), "Список подзадач должен быть пустым");
     }
 
     @Test
@@ -66,24 +61,14 @@ public class FileBackedTaskManagerTest {
         Subtask actualSub = taskManager.addNewTask(subtask);
 
         // check
-        boolean isTaskInFile = false;
-        boolean isEpicInFile = false;
-        boolean isSubInFile = false;
-        for (String s : Files.readAllLines(file.toPath())) {
-            if (s.contains(actualTask.getDescription())) {
-                isTaskInFile = true;
-            } else if (s.contains(actualEpic.getDescription())) {
-                isEpicInFile = true;
-            } else if (s.contains(actualSub.getDescription())) {
-                isSubInFile = true;
-            }
-        }
-
-        assertTrue(isTaskInFile && isEpicInFile && isSubInFile);
+        String fileContent = Files.readString(file.toPath());
+        assertTrue(fileContent.contains(actualTask.getDescription()), "Файл должен содержать задачу");
+        assertTrue(fileContent.contains(actualEpic.getDescription()), "Файл должен содержать эпик");
+        assertTrue(fileContent.contains(actualSub.getDescription()), "Файл должен содержать подзадачу");
     }
 
     @Test
-    void save_shouldLoadTasks() throws ManagerLoadException {
+    void save_shouldLoadTasks() throws IOException, ManagerLoadException {
         // prepare
         Task task = new Task("Task 1", "Task Description");
         Epic epic = new Epic("Epic 1", "Epic Description");
@@ -97,12 +82,12 @@ public class FileBackedTaskManagerTest {
         // check
         FileBackedTaskManager manager = taskManager.loadFromFile(file);
 
-        Task loadTask = manager.getTask(0);
-        Epic loadEpic = manager.getEpic(1);
-        Subtask loadSub = manager.getSubtask(2);
+        Task loadTask = manager.getTask(actualTask.getId());
+        Epic loadEpic = manager.getEpic(actualEpic.getId());
+        Subtask loadSub = manager.getSubtask(actualSub.getId());
 
-        assertEquals(actualTask, loadTask);
-        assertEquals(actualEpic, loadEpic);
-        assertEquals(actualSub, loadSub);
+        assertEquals(actualTask, loadTask, "Задачи должны совпадать");
+        assertEquals(actualEpic, loadEpic, "Эпики должны совпадать");
+        assertEquals(actualSub, loadSub, "Подзадачи должны совпадать");
     }
 }
