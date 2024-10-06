@@ -3,19 +3,14 @@ package managers;
 import exceptions.ManagerLoadException;
 import exceptions.ManagerSaveException;
 import tasks.*;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
-
-import static tasks.TaskType.SUBTASK;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -47,7 +42,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             if (!getAllTasks().isEmpty() || !getAllSubtasks().isEmpty() || !getAllEpic().isEmpty()) {
                 fileWriter.write("ID,TYPE,NAME,STATUS,DESCRIPTION,EPIC,DURATION,START_TIME,END_TIME\n");
 
-                // Использование Stream API для записи всех задач
                 getAllTasks().stream()
                         .map(Task::toString)
                         .forEach(task -> {
@@ -95,7 +89,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         TaskStatus status = TaskStatus.valueOf(fields[3]);  // Здесь статус задачи обрабатывается как TaskStatus
         String description = fields[4];
 
-        // В зависимости от типа задачи, обрабатываем различные поля
         switch (type) {
             case TASK:
                 return new Task(id, title, description, status);  // Здесь передается статус, а не Integer
