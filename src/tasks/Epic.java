@@ -28,7 +28,7 @@ public class Epic extends Task {
     public Epic(int id, String name, String description,
                 TaskStatus status, Duration duration,
                 LocalDateTime startTime, LocalDateTime endTime) {
-        super(id, name, description, status, duration, startTime);
+        super(id, name, description, status, duration);
         this.endTime = endTime;
     }
 
@@ -36,9 +36,6 @@ public class Epic extends Task {
         super(id);
     }
 
-    public LocalDateTime getEndTime() {
-        return null;
-    }
 
     public ArrayList<Integer> getEpicSubtasksId() {
         return new ArrayList<>(epicSubtasks);
@@ -70,6 +67,18 @@ public class Epic extends Task {
 
     public void clearSubtasks() {
         epicSubtasks.clear();
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        if (startTime != null && duration != null) {
+            return startTime.plus(duration);
+        }
+        return null;
     }
 
     @Override

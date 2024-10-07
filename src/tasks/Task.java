@@ -43,17 +43,13 @@ public class Task {
         this.id = id;
     }
 
-    public Task(int id, String name, String description, TaskStatus status, Duration duration, LocalDateTime startTime) {
+    public Task(int id, String name, String description, TaskStatus status, Duration duration) {
         this.name = name;
         this.description = description;
         this.id = id;
         this.status = status;
         this.duration = duration;
-        this.startTime = startTime;
-    }
-
-    public LocalDateTime getEndTime() {
-        return null;
+        this.startTime = LocalDateTime.now();
     }
 
     public String getName() {
@@ -108,6 +104,33 @@ public class Task {
     @Override
     public String toString() {
         return String.format("%s,%s,%s,%s,%s", id, type, name, status, description);
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime != null && duration != null ? startTime.plus(duration) : null;
+    }
+
+    public boolean overlaps(Task other) {
+        LocalDateTime thisEnd = getEndTime();
+        LocalDateTime otherEnd = other.getEndTime();
+        return startTime != null && other.getStartTime() != null &&
+                startTime.isBefore(otherEnd) && thisEnd.isAfter(other.getStartTime());
     }
 
 }

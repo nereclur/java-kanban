@@ -51,7 +51,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                                 throw new ManagerSaveException(ex.getMessage());
                             }
                         });
-
                 getAllEpic().stream()
                         .map(Task::toString)
                         .forEach(epic -> {
@@ -61,7 +60,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                                 throw new ManagerSaveException(ex.getMessage());
                             }
                         });
-
                 getAllSubtasks().stream()
                         .map(Task::toString)
                         .forEach(subtask -> {
@@ -76,7 +74,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             throw new ManagerSaveException(ex.getMessage());
         }
     }
-
 
     private static Task fromString(String value) {
         String[] fields = value.split(",");
@@ -105,19 +102,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-
     public static FileBackedTaskManager loadFromFile(File file) throws ManagerLoadException {
         if (file == null) {
             throw new IllegalArgumentException("Файл не может возвращать null");
         }
-
         Map<Integer, Task> tasks = new HashMap<>();
         Map<Integer, Subtask> subtasks = new HashMap<>();
         Map<Integer, Epic> epics = new HashMap<>();
         int maxId = 0;
-
         int[] maxIdContainer = {maxId};
-
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             br.lines()
                     .skip(1)
@@ -138,7 +131,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                             }
                         }
                     });
-
             subtasks.values().stream()
                     .forEach(sub -> {
                         Epic epic = epics.get(sub.getEpicId());
@@ -146,12 +138,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                             epic.addSubtask(sub);
                         }
                     });
-
         } catch (IOException ex) {
             throw new ManagerLoadException(ex.getMessage());
         }
         maxId = maxIdContainer[0];
-
 
         return new FileBackedTaskManager(file, tasks, epics, subtasks, maxId);
     }
