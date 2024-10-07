@@ -7,7 +7,6 @@ import tasks.TaskStatus;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -67,7 +66,6 @@ public class InMemoryTaskManager implements TaskManager {
         LocalDateTime end2 = task2.getEndTime();
         return start1.isBefore(end2) && start2.isBefore(end1);  // Условие пересечения
     }
-
 
 
     @Override
