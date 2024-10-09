@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import tasks.Epic;
 import tasks.Subtask;
 import tasks.Task;
+import tasks.TaskStatus;
 
 import java.io.File;
 import java.io.IOException;
@@ -112,6 +113,45 @@ public class FileBackedTaskManagerTest {
         taskManager.addNewTask(task2);
 
         assertFalse(taskManager.hasTimeConflicts(task2), "В задачах не должно быть пересечений.");
+    }
+
+    @Test
+    public void shouldCalculateEpicStatus() {
+        Epic epic = new Epic("Epic 1", "Epic description");
+        taskManager.addNewTask(epic);
+
+        Subtask subtask1 = new Subtask("Subtask 1", "Description 1", epic.getId());
+        subtask1.setStartTime(LocalDateTime.of(2024, 10, 7, 10, 0));
+        subtask1.setDuration(Duration.ofHours(2));
+        subtask1.setStatus(TaskStatus.NEW);
+        taskManager.addNewTask(subtask1);
+
+        Subtask subtask2 = new Subtask("Subtask 2", "Description 2", epic.getId());
+        subtask2.setStartTime(LocalDateTime.of(2024, 10, 7, 12, 0));
+        subtask2.setDuration(Duration.ofHours(1));
+        subtask2.setStatus(TaskStatus.DONE);
+        taskManager.addNewTask(subtask2);
+
+        taskManager.refreshEpicStatus(epic.getId());
+
+        System.out.println("Subtask 1 Status: " + subtask1.getStatus());
+        System.out.println("Subtask 2 Status: " + subtask2.getStatus());
+        System.out.println("Epic Status After Refresh: " + taskManager.getEpic(epic.getId()).getStatus());
+
+        assertEquals(TaskStatus.IN_PROGRESS, taskManager.getEpic(epic.getId()).getStatus(),
+                "Epic status should be IN_PROGRESS");
+    }
+
+    @Test
+    public void shouldGetEndTime() {
+        Task task = new Task("Task 1", "Description 1");
+        task.setStartTime(LocalDateTime.of(2024, 10, 7, 10, 0));
+        task.setDuration(Duration.ofHours(2));
+
+        taskManager.addNewTask(task);
+        LocalDateTime expectedEndTime = task.getStartTime().plus(task.getDuration());
+
+        assertEquals(expectedEndTime, task.getEndTime(), "End time should be calculated correctly.");
     }
 }
 

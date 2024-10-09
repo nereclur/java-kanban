@@ -361,27 +361,19 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
+    public void refreshEpicStatus(int epicId) {
+        Epic epic = getEpic(epicId);
+        if (epic != null) {
+            List<Subtask> subtasks = getEpicSubtasks(epicId);
+            boolean hasNew = subtasks.stream().anyMatch(subtask -> subtask.getStatus() == TaskStatus.NEW);
+            boolean allDone = subtasks.stream().allMatch(subtask -> subtask.getStatus() == TaskStatus.DONE);
 
-    protected void refreshEpicStatus(Integer epicId) {
-        if (getEpicSubtasks(epicId).isEmpty()) {
-            idEpic.get(epicId).setStatus(TaskStatus.NEW);
-        } else {
-            long countNew = getEpicSubtasks(epicId).stream()
-                    .filter(subtask -> subtask != null && subtask.getStatus() == TaskStatus.NEW)
-                    .count();
-
-            long countDone = getEpicSubtasks(epicId).stream()
-                    .filter(subtask -> subtask != null && subtask.getStatus() == TaskStatus.DONE)
-                    .count();
-
-            int totalSubtasks = getEpicSubtasks(epicId).size();
-
-            if (countNew == totalSubtasks) {
-                idEpic.get(epicId).setStatus(TaskStatus.NEW);
-            } else if (countDone == totalSubtasks) {
-                idEpic.get(epicId).setStatus(TaskStatus.DONE);
+            if (hasNew) {
+                epic.setStatus(TaskStatus.IN_PROGRESS);
+            } else if (allDone) {
+                epic.setStatus(TaskStatus.DONE);
             } else {
-                idEpic.get(epicId).setStatus(TaskStatus.IN_PROGRESS);
+                epic.setStatus(TaskStatus.NEW);
             }
         }
     }
