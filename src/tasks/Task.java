@@ -1,5 +1,7 @@
 package tasks;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -8,7 +10,8 @@ public class Task {
     protected String description;
     protected int id;
     protected TaskStatus status;
-
+    protected Duration duration;
+    protected LocalDateTime startTime;
     protected final TaskType type = TaskType.TASK;
 
     public Task(int id) {
@@ -38,6 +41,15 @@ public class Task {
         this.name = name;
         this.description = description;
         this.id = id;
+    }
+
+    public Task(int id, String name, String description, TaskStatus status, Duration duration) {
+        this.name = name;
+        this.description = description;
+        this.id = id;
+        this.status = status;
+        this.duration = duration;
+        this.startTime = LocalDateTime.now();
     }
 
     public String getName() {
@@ -92,6 +104,33 @@ public class Task {
     @Override
     public String toString() {
         return String.format("%s,%s,%s,%s,%s", id, type, name, status, description);
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime != null && duration != null ? startTime.plus(duration) : null;
+    }
+
+    public boolean overlaps(Task other) {
+        LocalDateTime thisEnd = getEndTime();
+        LocalDateTime otherEnd = other.getEndTime();
+        return startTime != null && other.getStartTime() != null &&
+                startTime.isBefore(otherEnd) && thisEnd.isAfter(other.getStartTime());
     }
 
 }
