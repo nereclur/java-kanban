@@ -24,11 +24,17 @@ public interface TaskManager {
 
     Task deleteTask(Integer taskId);
 
+    Epic deleteEpic(Integer epicId);
+
+    Subtask deleteSubtask(Integer subtaskId);
+
     void deleteAllTasks();
 
     void deleteAllSubtasks();
 
     void deleteAllEpic();
+
+    List<Task> getPrioritizedTasks();
 
     List<Task> getAllTasks();
 
