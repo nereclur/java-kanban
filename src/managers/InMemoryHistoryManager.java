@@ -42,13 +42,13 @@ public class InMemoryHistoryManager implements HistoryManager {
             return;
         }
 
-        // is head
+
         if (prevNode == null) {
             nextNode.prev = null;
             head = nextNode;
             System.out.println("Head node links removed");
 
-            // is tail
+
         } else if (nextNode == null) {
             prevNode.next = null;
             tail = prevNode;
@@ -62,8 +62,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         }
     }
 
-    // Реализация метода getHistory должна перекладывать задачи из связного списка
-    // в ArrayList для формирования ответа.
     @Override
     public List<Task> getHistory() {
         List<Task> result = new ArrayList<>();
@@ -93,8 +91,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void add(Task task) {
         if (Objects.nonNull(task)) {
-            // по условию ФЗ-5 в истории должно сохраняться состояние задачи на момент фиксации
-            // поэтому делаем глубокую копию
             Task copyTask = new Task(task.getId(), task.getName(), task.getDescription(), task.getStatus(),
                     task.getDuration(), task.getStartTime());
 
