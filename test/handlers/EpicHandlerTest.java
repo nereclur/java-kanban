@@ -208,6 +208,18 @@ public class EpicHandlerTest {
         List<Subtask> subs = subtaskGson.fromJson(response.body(), new SubtaskListTypeToken().getType());
         assertEquals(actualSubtask, subs.get(0));
     }
+
+    @Test
+    public void getNonExistentEpic_shouldReturn404() throws IOException, InterruptedException {
+        URI url = URI.create("http://localhost:8080/epics/99");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(url)
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(404, response.statusCode());
+    }
 }
 class SubtaskListTypeToken extends TypeToken<List<Subtask>> {
 
