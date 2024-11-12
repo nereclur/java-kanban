@@ -8,12 +8,6 @@ import java.util.List;
 
 public interface TaskManager {
 
-    List<Task> getPrioritizedTasks();
-
-    boolean hasTimeConflicts(Task newTask);
-
-    boolean tasksOverlap(Task task1, Task task2);
-
     HistoryManager getHistoryManager();
 
     Task addNewTask(Task newTask);
@@ -30,11 +24,17 @@ public interface TaskManager {
 
     Task deleteTask(Integer taskId);
 
+    Epic deleteEpic(Integer epicId);
+
+    Subtask deleteSubtask(Integer subtaskId);
+
     void deleteAllTasks();
 
     void deleteAllSubtasks();
 
     void deleteAllEpic();
+
+    List<Task> getPrioritizedTasks();
 
     List<Task> getAllTasks();
 
